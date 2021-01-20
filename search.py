@@ -184,7 +184,41 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    from game import Directions
+
+    # initialization
+    fringe = util.PriorityQueue()
+    visitedList = []
+
+    # push the starting point into queue
+    fringe.push((problem.getStartState(), [], 0),
+                0 + heuristic(problem.getStartState(), problem))
+    # pop out the point
+    (state, toDirection, toCost) = fringe.pop()
+    # add the point to visited list
+    visitedList.append((state, toCost + heuristic(problem.getStartState(), problem)))
+
+    while not problem.isGoalState(state):  # while we do not find the goal point
+        successors = problem.getSuccessors(state)  # get the point's successors
+        for son in successors:
+            visited_Exist = False
+            total_cost = toCost + son[2]
+            for (visitedState, visitedToCost) in visitedList:
+                # if the successor has not been visited, or has a lower cost than the previous one
+                if (son[0] == visitedState) and (total_cost >= visitedToCost):
+                    visited_Exist = True
+                    break
+
+            if not visited_Exist:
+                # push the point with priority num of its total cost
+                fringe.push((son[0], toDirection + [son[1]], toCost + son[2]),
+                            toCost + son[2] + heuristic(son[0], problem))
+                visitedList.append((son[0], toCost + son[2]))  # add this point to visited list
+
+        (state, toDirection, toCost) = fringe.pop()
+
+    return toDirection
+    # util.raiseNotDefined()
 
 
 # Abbreviations
